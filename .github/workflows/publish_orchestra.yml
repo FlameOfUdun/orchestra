@@ -1,0 +1,29 @@
+name: Publish orchestra
+
+on:
+  push:
+    tags:
+      - 'orchestra-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish:
+    name: Publish to pub.dev
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # Required for OIDC authentication with pub.dev
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Install dependencies
+        working-directory: orchestra
+        run: dart pub get
+
+      - name: Publish
+        working-directory: orchestra
+        run: dart pub publish --force
