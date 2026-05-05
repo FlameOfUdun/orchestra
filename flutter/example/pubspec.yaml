@@ -11,8 +11,7 @@ dependencies:
     sdk: flutter
 
   shared_preferences: ^2.5.3
-  orchestra: 
-    path: ../../orchestra
+  orchestra: ^1.0.2
   orchestra_flutter:
     path: ../
 

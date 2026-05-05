@@ -1,6 +1,6 @@
 name: orchestra_flutter
 description: Flutter widget integration for Orchestra — scope, reactive widgets, and handler API connecting the Orchestra runtime to the Flutter widget tree.
-version: 1.0.1
+version: 1.0.2
 issue_tracker: https://github.com/FlameOfUdun/orchestra/issues
 repository: https://github.com/FlameOfUdun/orchestra
 homepage: https://github.com/FlameOfUdun/orchestra
@@ -20,7 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
   
-  orchestra: ^1.0.1
+  orchestra: ^1.0.2
 
 dev_dependencies:
   flutter_test:

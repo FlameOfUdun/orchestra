@@ -1,0 +1,14 @@
+name: orchestra_example
+description: "Example project for the orchestra core package"
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  orchestra:
+    path: ../
+
+dev_dependencies:
+  lints: ^5.0.0
