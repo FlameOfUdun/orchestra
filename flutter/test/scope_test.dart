@@ -50,7 +50,9 @@ class TestReactiveSystem extends ReactiveSystem {
 
 void main() {
   group('OrchestraScope Tests', () {
-    testWidgets('should create and provide Orchestrator to descendants', (WidgetTester tester) async {
+    testWidgets('should create and provide Orchestrator to descendants', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
       Orchestrator? retrievedOrchestrator;
 
@@ -74,7 +76,9 @@ void main() {
       expect(retrievedOrchestrator, isA<Orchestrator>());
     });
 
-    testWidgets('should initialize orchestrations on mount', (WidgetTester tester) async {
+    testWidgets('should initialize orchestrations on mount', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
 
       await tester.pumpWidget(
@@ -94,7 +98,9 @@ void main() {
       expect(counter.value, equals(0));
     });
 
-    testWidgets('should teardown and deactivate manager on dispose', (WidgetTester tester) async {
+    testWidgets('should teardown and deactivate manager on dispose', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
 
       await tester.pumpWidget(
@@ -118,9 +124,7 @@ void main() {
 
       // Remove the scope
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Text('Different Widget'),
-        ),
+        const MaterialApp(home: Text('Different Widget')),
       );
 
       await tester.pumpAndSettle();
@@ -130,7 +134,9 @@ void main() {
       expect(find.text('Different Widget'), findsOneWidget);
     });
 
-    testWidgets('should return null with maybeOf when scope not found', (WidgetTester tester) async {
+    testWidgets('should return null with maybeOf when scope not found', (
+      WidgetTester tester,
+    ) async {
       Orchestrator? orchestrator;
 
       await tester.pumpWidget(
@@ -147,7 +153,9 @@ void main() {
       expect(orchestrator, isNull);
     });
 
-    testWidgets('should throw error with of when scope not found', (WidgetTester tester) async {
+    testWidgets('should throw error with of when scope not found', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
@@ -181,27 +189,32 @@ void main() {
       expect(find.text('Test'), findsOneWidget);
     });
 
-    testWidgets('should run execution loop when orchestrations have execute systems', (WidgetTester tester) async {
-      final orchestration = TestOrchestration();
+    testWidgets(
+      'should run execution loop when orchestrations have execute systems',
+      (WidgetTester tester) async {
+        final orchestration = TestOrchestration();
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: OrchestraScope(
-            orchestrations: {orchestration},
-            child: const Text('Test'),
+        await tester.pumpWidget(
+          MaterialApp(
+            home: OrchestraScope(
+              orchestrations: {orchestration},
+              child: const Text('Test'),
+            ),
           ),
-        ),
-      );
+        );
 
-      // Pump multiple frames to verify ticker is running
-      await tester.pump(const Duration(milliseconds: 16));
-      await tester.pump(const Duration(milliseconds: 16));
-      await tester.pump(const Duration(milliseconds: 16));
+        // Pump multiple frames to verify ticker is running
+        await tester.pump(const Duration(milliseconds: 16));
+        await tester.pump(const Duration(milliseconds: 16));
+        await tester.pump(const Duration(milliseconds: 16));
 
-      expect(find.text('Test'), findsOneWidget);
-    });
+        expect(find.text('Test'), findsOneWidget);
+      },
+    );
 
-    testWidgets('should support nested Orchestra scopes', (WidgetTester tester) async {
+    testWidgets('should support nested Orchestra scopes', (
+      WidgetTester tester,
+    ) async {
       final outerOrchestration = TestOrchestration();
       final innerOrchestration = EmptyOrchestration();
 

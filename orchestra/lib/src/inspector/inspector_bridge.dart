@@ -61,19 +61,23 @@ final class InspectorBridge {
     _registry = registry;
     _serverStartedAtMicros = _nowMicros();
 
-    developer.registerExtension(kSubscribeExtension, (method, parameters) async {
+    developer.registerExtension(kSubscribeExtension,
+        (method, parameters) async {
       final response = _onSubscribe();
-      return developer.ServiceExtensionResponse.result(jsonEncode(response.toJson()));
+      return developer.ServiceExtensionResponse.result(
+          jsonEncode(response.toJson()));
     });
 
-    developer.registerExtension(kUnsubscribeExtension, (method, parameters) async {
+    developer.registerExtension(kUnsubscribeExtension,
+        (method, parameters) async {
       _onUnsubscribe();
       return developer.ServiceExtensionResponse.result('{}');
     });
 
     developer.registerExtension(kResyncExtension, (method, parameters) async {
       final response = _buildSnapshot();
-      return developer.ServiceExtensionResponse.result(jsonEncode(response.toJson()));
+      return developer.ServiceExtensionResponse.result(
+          jsonEncode(response.toJson()));
     });
   }
 
@@ -329,7 +333,8 @@ final class InspectorBridge {
 
   String _orchestratorId(Orchestrator orchestrator) => orchestrator.identifier;
 
-  String _orchestrationId(Orchestration orchestration) => orchestration.identifier;
+  String _orchestrationId(Orchestration orchestration) =>
+      orchestration.identifier;
 
   OrchestratorDto _orchestratorDto(Orchestrator orchestrator) {
     return OrchestratorDto(

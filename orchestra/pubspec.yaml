@@ -1,10 +1,10 @@
 name: orchestra
-description: Reactive Entity-Component-System (ECS) state management for Dart and Flutter. Clean architecture, deterministic logic, and built-in DevTools Inspector.
+description: Reactive state management for Dart and Flutter. Clean architecture, deterministic logic, and built-in DevTools Inspector.
 issue_tracker: https://github.com/FlameOfUdun/orchestra/issues
 repository: https://github.com/FlameOfUdun/orchestra
 homepage: https://github.com/FlameOfUdun/orchestra
 readme: README.md
-version: 1.0.0
+version: 1.0.1
 
 topics:
   - state-management

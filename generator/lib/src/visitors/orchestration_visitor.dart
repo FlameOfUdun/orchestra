@@ -27,6 +27,7 @@ final class OrchestrationVisitor extends RecursiveAstVisitor<void> {
     final element = node.declaredFragment?.element;
     if (element is! VariableElement) return;
 
-    orchestrator.addOrchestration(OrchestrationModel(name: node.name.lexeme, element: element));
+    orchestrator.addOrchestration(
+        OrchestrationModel(name: node.name.lexeme, element: element));
   }
 }

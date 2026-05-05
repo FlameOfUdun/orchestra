@@ -10,11 +10,13 @@ final class SelectedRouteComponent extends Component<AppRoutes> {
   SelectedRouteComponent() : super(AppRoutes.home);
 }
 
-final class NavigatorKeyDependency extends Dependency<GlobalKey<NavigatorState>> {
+final class NavigatorKeyDependency
+    extends Dependency<GlobalKey<NavigatorState>> {
   NavigatorKeyDependency() : super(GlobalKey<NavigatorState>());
 }
 
-final class NavigateToDashboardWhenLoggedInReactiveSystem extends ReactiveSystem {
+final class NavigateToDashboardWhenLoggedInReactiveSystem
+    extends ReactiveSystem {
   @override
   Set<Type> get reactsTo {
     return const {AuthStateComponent};
@@ -36,7 +38,8 @@ final class NavigateToDashboardWhenLoggedInReactiveSystem extends ReactiveSystem
   }
 }
 
-final class HandleNavigateToLoginWhenLoggedOutReactiveSystem extends ReactiveSystem {
+final class HandleNavigateToLoginWhenLoggedOutReactiveSystem
+    extends ReactiveSystem {
   @override
   Set<Type> get reactsTo {
     return const {AuthStateComponent};

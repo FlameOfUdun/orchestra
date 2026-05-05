@@ -12,7 +12,8 @@ final appRoute = navigationFeature.addComponent(AppRoutes.home);
 
 final selectedRoute = navigationFeature.addComponent(AppRoutes.home);
 
-final navigatorKey = navigationFeature.addDependency(GlobalKey<NavigatorState>());
+final navigatorKey =
+    navigationFeature.addDependency(GlobalKey<NavigatorState>());
 
 final navigateToDashboardWhenLoggedIn = navigationFeature.addReactiveSystem(
   reactsTo: {authState},
@@ -42,4 +43,3 @@ final handleNavigateToSelectedRoute = navigationFeature.addReactiveSystem(
     key.pushReplacementNamed(route);
   },
 );
-

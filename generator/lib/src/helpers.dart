@@ -17,7 +17,8 @@ Set<VariableElement> extractModifiedEntities(
 
 VariableElement? resolveToVariable(Element? element) {
   if (element is VariableElement) return element;
-  if (element is PropertyAccessorElement) return element.variable as VariableElement?;
+  if (element is PropertyAccessorElement)
+    return element.variable as VariableElement?;
   return null;
 }
 
@@ -139,7 +140,9 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
 
   if (expr is MethodInvocation) {
     final typeArgs = expr.typeArguments?.toSource() ?? '';
-    final args = expr.argumentList.arguments.map((a) => rewriteExpression(a, orchestrator)).join(', ');
+    final args = expr.argumentList.arguments
+        .map((a) => rewriteExpression(a, orchestrator))
+        .join(', ');
 
     if (expr.target != null) {
       final target = rewriteExpression(expr.target as Expression, orchestrator);
@@ -160,13 +163,17 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
   if (expr is InstanceCreationExpression) {
     final kw = expr.keyword?.lexeme;
     final name = expr.constructorName.toSource();
-    final args = expr.argumentList.arguments.map((a) => rewriteExpression(a, orchestrator)).join(', ');
+    final args = expr.argumentList.arguments
+        .map((a) => rewriteExpression(a, orchestrator))
+        .join(', ');
     return kw != null ? '$kw $name($args)' : '$name($args)';
   }
 
   if (expr is FunctionExpressionInvocation) {
     final fn = rewriteExpression(expr.function, orchestrator);
-    final args = expr.argumentList.arguments.map((a) => rewriteExpression(a, orchestrator)).join(', ');
+    final args = expr.argumentList.arguments
+        .map((a) => rewriteExpression(a, orchestrator))
+        .join(', ');
     return '$fn($args)';
   }
 
@@ -182,20 +189,25 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
 
   if (expr is ListLiteral) {
     final typeArgs = expr.typeArguments?.toSource() ?? '';
-    final elements = expr.elements.map((e) => _rewriteCollectionElement(e, orchestrator)).join(', ');
+    final elements = expr.elements
+        .map((e) => _rewriteCollectionElement(e, orchestrator))
+        .join(', ');
     final constKw = expr.constKeyword != null ? 'const ' : '';
     return '$constKw$typeArgs[$elements]';
   }
 
   if (expr is SetOrMapLiteral) {
     final typeArgs = expr.typeArguments?.toSource() ?? '';
-    final elements = expr.elements.map((e) => _rewriteCollectionElement(e, orchestrator)).join(', ');
+    final elements = expr.elements
+        .map((e) => _rewriteCollectionElement(e, orchestrator))
+        .join(', ');
     final constKw = expr.constKeyword != null ? 'const ' : '';
     return '$constKw$typeArgs{$elements}';
   }
 
   if (expr is RecordLiteral) {
-    final fields = expr.fields.map((f) => rewriteExpression(f, orchestrator)).join(', ');
+    final fields =
+        expr.fields.map((f) => rewriteExpression(f, orchestrator)).join(', ');
     final constKw = expr.constKeyword != null ? 'const ' : '';
     return '$constKw($fields)';
   }
@@ -216,7 +228,9 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
 
   if (expr is CascadeExpression) {
     final target = rewriteExpression(expr.target, orchestrator);
-    final sections = expr.cascadeSections.map((s) => rewriteExpression(s, orchestrator)).join();
+    final sections = expr.cascadeSections
+        .map((s) => rewriteExpression(s, orchestrator))
+        .join();
     return '$target$sections';
   }
 
@@ -226,8 +240,11 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
     for (final c in expr.cases) {
       final pattern = c.guardedPattern.pattern.toSource();
       final whenClause = c.guardedPattern.whenClause;
-      final guard = whenClause != null ? ' when ${rewriteExpression(whenClause.expression, orchestrator)}' : '';
-      buffer.writeln('  $pattern$guard => ${rewriteExpression(c.expression, orchestrator)},');
+      final guard = whenClause != null
+          ? ' when ${rewriteExpression(whenClause.expression, orchestrator)}'
+          : '';
+      buffer.writeln(
+          '  $pattern$guard => ${rewriteExpression(c.expression, orchestrator)},');
     }
     buffer.write('}');
     return buffer.toString();
@@ -236,7 +253,8 @@ String rewriteExpression(Expression expr, OrchestratorModel orchestrator) {
   return expr.toSource();
 }
 
-String _rewriteCollectionElement(CollectionElement element, OrchestratorModel orchestrator) {
+String _rewriteCollectionElement(
+    CollectionElement element, OrchestratorModel orchestrator) {
   if (element is Expression) {
     return rewriteExpression(element, orchestrator);
   }
@@ -253,7 +271,9 @@ String _rewriteCollectionElement(CollectionElement element, OrchestratorModel or
     final cond = rewriteExpression(element.expression, orchestrator);
     final then = _rewriteCollectionElement(element.thenElement, orchestrator);
     final elseElement = element.elseElement;
-    final elsePart = elseElement != null ? ' else ${_rewriteCollectionElement(elseElement, orchestrator)}' : '';
+    final elsePart = elseElement != null
+        ? ' else ${_rewriteCollectionElement(elseElement, orchestrator)}'
+        : '';
     return 'if ($cond) $then$elsePart';
   }
   if (element is ForElement) {
@@ -328,7 +348,8 @@ String rewriteStatement(Statement stmt, OrchestratorModel orchestrator) {
           if (args.isEmpty) {
             return 'get<${entity.entityType}>().trigger();';
           } else {
-            final transformedArgs = args.map((a) => rewriteExpression(a, orchestrator)).join(', ');
+            final transformedArgs =
+                args.map((a) => rewriteExpression(a, orchestrator)).join(', ');
             return 'get<${entity.entityType}>().trigger($transformedArgs);';
           }
         }
@@ -344,11 +365,14 @@ String rewriteStatement(Statement stmt, OrchestratorModel orchestrator) {
 
     for (final member in stmt.members) {
       if (member is SwitchCase) {
-        buffer.writeln('  case ${rewriteExpression(member.expression, orchestrator)}:');
+        buffer.writeln(
+            '  case ${rewriteExpression(member.expression, orchestrator)}:');
       } else if (member is SwitchPatternCase) {
         final pattern = member.guardedPattern.pattern.toSource();
         final whenClause = member.guardedPattern.whenClause;
-        final guard = whenClause != null ? ' when ${rewriteExpression(whenClause.expression, orchestrator)}' : '';
+        final guard = whenClause != null
+            ? ' when ${rewriteExpression(whenClause.expression, orchestrator)}'
+            : '';
         buffer.writeln('  case $pattern$guard:');
       } else if (member is SwitchDefault) {
         buffer.writeln('  default:');
@@ -403,7 +427,8 @@ String rewriteStatement(Statement stmt, OrchestratorModel orchestrator) {
       if (clause.catchKeyword != null) {
         final ex = clause.exceptionParameter?.name.lexeme ?? '_';
         final st = clause.stackTraceParameter;
-        buffer.write(st != null ? ' catch ($ex, ${st.name.lexeme})' : ' catch ($ex)');
+        buffer.write(
+            st != null ? ' catch ($ex, ${st.name.lexeme})' : ' catch ($ex)');
       }
       buffer.write(' ');
       buffer.write(rewriteBlock(clause.body, orchestrator));
@@ -421,7 +446,8 @@ String rewriteStatement(Statement stmt, OrchestratorModel orchestrator) {
     final then = rewriteStatement(stmt.thenStatement, orchestrator);
     final buffer = StringBuffer('if ($cond) $then');
     if (stmt.elseStatement != null) {
-      buffer.write(' else ${rewriteStatement(stmt.elseStatement!, orchestrator)}');
+      buffer.write(
+          ' else ${rewriteStatement(stmt.elseStatement!, orchestrator)}');
     }
     return buffer.toString();
   }
@@ -477,7 +503,8 @@ String rewriteStatement(Statement stmt, OrchestratorModel orchestrator) {
     final ret = decl.returnType?.toSource();
     final hName = decl.name.lexeme;
     final params = decl.functionExpression.parameters?.toSource() ?? '()';
-    final body = rewriteFunctionBody(decl.functionExpression.body, orchestrator);
+    final body =
+        rewriteFunctionBody(decl.functionExpression.body, orchestrator);
     return '${ret != null ? '$ret ' : ''}$hName$params $body';
   }
 

@@ -53,11 +53,7 @@ class TestOrchestraWidget extends OrchestraWidget {
   final Function(OrchestraHandle)? onBuild;
   final Widget Function(BuildContext, OrchestraHandle)? customBuilder;
 
-  const TestOrchestraWidget({
-    super.key,
-    this.onBuild,
-    this.customBuilder,
-  });
+  const TestOrchestraWidget({super.key, this.onBuild, this.customBuilder});
 
   @override
   Widget build(BuildContext context, OrchestraHandle handle) {
@@ -112,7 +108,9 @@ void main() {
       expect(stringComponent.value, equals('initial'));
     });
 
-    testWidgets('should watch entities and trigger rebuilds on change', (WidgetTester tester) async {
+    testWidgets('should watch entities and trigger rebuilds on change', (
+      WidgetTester tester,
+    ) async {
       final counter = orchestra.watch<TestCounterComponent>();
 
       expect(rebuildCount, equals(0));
@@ -126,7 +124,9 @@ void main() {
       expect(rebuildCount, equals(1));
     });
 
-    testWidgets('should not trigger rebuild when locked', (WidgetTester tester) async {
+    testWidgets('should not trigger rebuild when locked', (
+      WidgetTester tester,
+    ) async {
       final counter = orchestra.watch<TestCounterComponent>();
 
       // Simulate locked state
@@ -138,7 +138,9 @@ void main() {
       expect(rebuildCount, equals(0));
     });
 
-    testWidgets('should handle multiple watchers correctly', (WidgetTester tester) async {
+    testWidgets('should handle multiple watchers correctly', (
+      WidgetTester tester,
+    ) async {
       final counter = orchestra.watch<TestCounterComponent>();
       final stringComponent = orchestra.watch<TestStringComponent>();
 
@@ -155,7 +157,9 @@ void main() {
       expect(rebuildCount, equals(2));
     });
 
-    testWidgets('should call listeners when entity changes', (WidgetTester tester) async {
+    testWidgets('should call listeners when entity changes', (
+      WidgetTester tester,
+    ) async {
       bool listenerCalled = false;
       TestCounterComponent? receivedEntity;
 
@@ -174,7 +178,9 @@ void main() {
       expect(receivedEntity!.value, equals(7));
     });
 
-    testWidgets('should call onEnter callback when initialized', (WidgetTester tester) async {
+    testWidgets('should call onEnter callback when initialized', (
+      WidgetTester tester,
+    ) async {
       bool onEnterCalled = false;
 
       orchestra.onEnter(() {
@@ -232,7 +238,9 @@ void main() {
   });
 
   group('Edge Cases and Error Handling', () {
-    testWidgets('should handle rapid entity changes', (WidgetTester tester) async {
+    testWidgets('should handle rapid entity changes', (
+      WidgetTester tester,
+    ) async {
       final orchestrator = Orchestrator();
       final orchestration = TestOrchestration();
       orchestrator.addOrchestration(orchestration);
@@ -260,41 +268,44 @@ void main() {
       orchestra.dispose();
     });
 
-    testWidgets('should prevent multiple builds when previous build is not completed', (WidgetTester tester) async {
-      final orchestrator = Orchestrator();
-      final orchestration = TestOrchestration();
-      orchestrator.addOrchestration(orchestration);
-      orchestrator.activate();
+    testWidgets(
+      'should prevent multiple builds when previous build is not completed',
+      (WidgetTester tester) async {
+        final orchestrator = Orchestrator();
+        final orchestration = TestOrchestration();
+        orchestrator.addOrchestration(orchestration);
+        orchestrator.activate();
 
-      int rebuildCount = 0;
+        int rebuildCount = 0;
 
-      final orchestra = OrchestraHandle(orchestrator, () {
-        rebuildCount++;
-      });
+        final orchestra = OrchestraHandle(orchestrator, () {
+          rebuildCount++;
+        });
 
-      final counter = orchestra.watch<TestCounterComponent>();
+        final counter = orchestra.watch<TestCounterComponent>();
 
-      // Trigger first build
-      counter.update(1);
+        // Trigger first build
+        counter.update(1);
 
-      // Immediately trigger more changes while first build is in progress
-      counter.update(2);
-      counter.update(3);
-      counter.update(4);
+        // Immediately trigger more changes while first build is in progress
+        counter.update(2);
+        counter.update(3);
+        counter.update(4);
 
-      // Verify orchestra is locked during build
-      expect(orchestra.locked, isTrue);
+        // Verify orchestra is locked during build
+        expect(orchestra.locked, isTrue);
 
-      await tester.pump();
+        await tester.pump();
 
-      // Should only rebuild once despite multiple changes
-      expect(rebuildCount, equals(1));
+        // Should only rebuild once despite multiple changes
+        expect(rebuildCount, equals(1));
 
-      // After frame callback, orchestra should be unlocked
-      expect(orchestra.locked, isFalse);
+        // After frame callback, orchestra should be unlocked
+        expect(orchestra.locked, isFalse);
 
-      orchestra.dispose();
-    });
+        orchestra.dispose();
+      },
+    );
 
     test('should handle watching same entity multiple times', () {
       final orchestrator = Orchestrator();

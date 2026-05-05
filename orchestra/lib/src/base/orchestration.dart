@@ -34,11 +34,17 @@ abstract class Orchestration {
   bool get isAttached => orchestrator != null;
 
   /// Unique identifier for this orchestration.
-  String get identifier => orchestrator != null ? "${orchestrator!.identifier}.$runtimeType" : "$runtimeType";
+  String get identifier => orchestrator != null
+      ? "${orchestrator!.identifier}.$runtimeType"
+      : "$runtimeType";
 
   /// Number of systems in this orchestration.
   int get systemsCount {
-    return initializeSystems.length + teardownSystems.length + reactiveSystems.length + cleanupSystems.length + executeSystems.length;
+    return initializeSystems.length +
+        teardownSystems.length +
+        reactiveSystems.length +
+        cleanupSystems.length +
+        executeSystems.length;
   }
 
   /// Indicates whether this orchestration has execute or cleanup systems.
@@ -59,7 +65,8 @@ abstract class Orchestration {
     } else if (element is System) {
       _addSystem(element);
     } else {
-      throw ArgumentError("Element of type ${element.runtimeType} is not supported");
+      throw ArgumentError(
+          "Element of type ${element.runtimeType} is not supported");
     }
   }
 
@@ -73,7 +80,8 @@ abstract class Orchestration {
   void _addEntity(Entity entity) {
     final existing = entities[entity.runtimeType];
     if (existing != null) {
-      throw StateError("Entity of type ${entity.runtimeType} already exists in this orchestration");
+      throw StateError(
+          "Entity of type ${entity.runtimeType} already exists in this orchestration");
     }
     entities[entity.runtimeType] = entity;
     entity.attach(this);
@@ -92,36 +100,42 @@ abstract class Orchestration {
     bool registered = false;
     if (system is InitializeSystem) {
       if (!initializeSystems.add(system)) {
-        throw StateError("System of type ${system.runtimeType} is already added to this orchestration");
+        throw StateError(
+            "System of type ${system.runtimeType} is already added to this orchestration");
       }
       registered = true;
     }
     if (system is TeardownSystem) {
       if (!teardownSystems.add(system)) {
-        throw StateError("System of type ${system.runtimeType} is already added to this orchestration");
+        throw StateError(
+            "System of type ${system.runtimeType} is already added to this orchestration");
       }
       registered = true;
     }
     if (system is CleanupSystem) {
       if (!cleanupSystems.add(system)) {
-        throw StateError("System of type ${system.runtimeType} is already added to this orchestration");
+        throw StateError(
+            "System of type ${system.runtimeType} is already added to this orchestration");
       }
       registered = true;
     }
     if (system is ExecuteSystem) {
       if (!executeSystems.add(system)) {
-        throw StateError("System of type ${system.runtimeType} is already added to this orchestration");
+        throw StateError(
+            "System of type ${system.runtimeType} is already added to this orchestration");
       }
       registered = true;
     }
     if (system is ReactiveSystem) {
       if (!reactiveSystems.add(system)) {
-        throw StateError("System of type ${system.runtimeType} is already added to this orchestration");
+        throw StateError(
+            "System of type ${system.runtimeType} is already added to this orchestration");
       }
       registered = true;
     }
     if (!registered) {
-      throw ArgumentError("System of type ${system.runtimeType} is not supported");
+      throw ArgumentError(
+          "System of type ${system.runtimeType} is not supported");
     }
     system.attach(this);
     system.inspectorId ??= InspectorBridge.instance.allocSystemId();
@@ -183,7 +197,8 @@ abstract class Orchestration {
   }
 
   /// Wraps a system invocation with inspector timing + emit.
-  void _invokeSystem(System system, void Function() body, {String? triggerEntityId}) {
+  void _invokeSystem(System system, void Function() body,
+      {String? triggerEntityId}) {
     if (!InspectorBridge.instance.enabled) {
       body();
       return;

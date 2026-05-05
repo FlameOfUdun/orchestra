@@ -39,7 +39,8 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
     }
 
     final init = node.initializer;
-    if (init is! MethodInvocation || !_supportedMethods.contains(init.methodName.name)) {
+    if (init is! MethodInvocation ||
+        !_supportedMethods.contains(init.methodName.name)) {
       super.visitVariableDeclaration(node);
       return;
     }
@@ -102,7 +103,8 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
       reactsIf: reactsIfExpr is FunctionExpression ? reactsIfExpr.body : null,
       helpers: [
         ..._resolveHelpers(reactExpr.body),
-        if (reactsIfExpr is FunctionExpression) ..._resolveHelpers(reactsIfExpr.body),
+        if (reactsIfExpr is FunctionExpression)
+          ..._resolveHelpers(reactsIfExpr.body),
       ],
     );
   }
@@ -126,10 +128,12 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
     return ExecuteSystemModel(
       name: name,
       execute: executeExpr.body,
-      executesIf: executesIfExpr is FunctionExpression ? executesIfExpr.body : null,
+      executesIf:
+          executesIfExpr is FunctionExpression ? executesIfExpr.body : null,
       helpers: [
         ..._resolveHelpers(executeExpr.body),
-        if (executesIfExpr is FunctionExpression) ..._resolveHelpers(executesIfExpr.body),
+        if (executesIfExpr is FunctionExpression)
+          ..._resolveHelpers(executesIfExpr.body),
       ],
     );
   }
@@ -156,7 +160,8 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
       cleansIf: cleansIfExpr is FunctionExpression ? cleansIfExpr.body : null,
       helpers: [
         ..._resolveHelpers(cleanupExpr.body),
-        if (cleansIfExpr is FunctionExpression) ..._resolveHelpers(cleansIfExpr.body),
+        if (cleansIfExpr is FunctionExpression)
+          ..._resolveHelpers(cleansIfExpr.body),
       ],
     );
   }
@@ -180,10 +185,12 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
     return TeardownSystemModel(
       name: name,
       teardown: teardownExpr.body,
-      teardownsIf: teardownsIfExpr is FunctionExpression ? teardownsIfExpr.body : null,
+      teardownsIf:
+          teardownsIfExpr is FunctionExpression ? teardownsIfExpr.body : null,
       helpers: [
         ..._resolveHelpers(teardownExpr.body),
-        if (teardownsIfExpr is FunctionExpression) ..._resolveHelpers(teardownsIfExpr.body),
+        if (teardownsIfExpr is FunctionExpression)
+          ..._resolveHelpers(teardownsIfExpr.body),
       ],
     );
   }
@@ -271,7 +278,10 @@ final class SystemVisitor extends RecursiveAstVisitor<void> {
 
   List<FunctionDeclaration> _extractLocalHelpers(FunctionBody body) {
     if (body is! BlockFunctionBody) return const [];
-    return body.block.statements.whereType<FunctionDeclarationStatement>().map((s) => s.functionDeclaration).toList();
+    return body.block.statements
+        .whereType<FunctionDeclarationStatement>()
+        .map((s) => s.functionDeclaration)
+        .toList();
   }
 }
 

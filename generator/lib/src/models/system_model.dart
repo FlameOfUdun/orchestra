@@ -18,15 +18,21 @@ sealed class SystemModel {
     this.helpers = const [],
   }) {
     final capitalized = capitalize(name);
-    systemType = capitalized.endsWith(suffix) ? capitalized : '$capitalized$suffix';
+    systemType =
+        capitalized.endsWith(suffix) ? capitalized : '$capitalized$suffix';
   }
 
   String generate();
 
   List<FunctionBody> get _bodiesToScan;
 
-  void _writeInteractsWith(StringBuffer buffer, OrchestratorModel orchestrator) {
-    final modified = extractModifiedEntities(_bodiesToScan, orchestrator).map((v) => orchestrator.getEntity(v)?.entityType).whereType<String>().toList()..sort();
+  void _writeInteractsWith(
+      StringBuffer buffer, OrchestratorModel orchestrator) {
+    final modified = extractModifiedEntities(_bodiesToScan, orchestrator)
+        .map((v) => orchestrator.getEntity(v)?.entityType)
+        .whereType<String>()
+        .toList()
+      ..sort();
 
     if (modified.isEmpty) return;
 
@@ -37,10 +43,12 @@ sealed class SystemModel {
     buffer.writeln();
   }
 
-  void _writeGuard(StringBuffer buffer, String guardName, FunctionBody? guard, OrchestratorModel orchestrator) {
+  void _writeGuard(StringBuffer buffer, String guardName, FunctionBody? guard,
+      OrchestratorModel orchestrator) {
     if (guard == null) return;
     buffer.writeln('  @override');
-    buffer.writeln('  bool get $guardName ${rewriteFunctionBody(guard, orchestrator)}');
+    buffer.writeln(
+        '  bool get $guardName ${rewriteFunctionBody(guard, orchestrator)}');
   }
 
   void _writeHelpers(StringBuffer buffer, OrchestratorModel orchestrator) {
@@ -49,7 +57,8 @@ sealed class SystemModel {
       final ret = helper.returnType?.toSource();
       final hName = helper.name.lexeme;
       final params = helper.functionExpression.parameters?.toSource() ?? '()';
-      final body = rewriteFunctionBody(helper.functionExpression.body, orchestrator);
+      final body =
+          rewriteFunctionBody(helper.functionExpression.body, orchestrator);
       buffer.write('  ${ret != null ? '$ret ' : ''}$hName$params $body');
     }
   }
@@ -85,12 +94,16 @@ final class ReactiveSystemModel extends SystemModel {
       if (resolved != null) return resolved;
       final fallback = e.name;
       if (fallback == null) {
-        throw StateError('ReactiveSystem "$name": cannot resolve a reactsTo entry to a known entity.');
+        throw StateError(
+            'ReactiveSystem "$name": cannot resolve a reactsTo entry to a known entity.');
       }
       return fallback;
-    }).toList()..sort()).join(', ');
+    }).toList()
+          ..sort())
+        .join(', ');
 
-    final buffer = StringBuffer('final class $systemType extends ReactiveSystem {\n');
+    final buffer =
+        StringBuffer('final class $systemType extends ReactiveSystem {\n');
     buffer.writeln('  @override');
     buffer.writeln('  Set<Type> get reactsTo {');
     buffer.writeln('    return const {$reactsToTokens};');
@@ -127,11 +140,13 @@ final class ExecuteSystemModel extends SystemModel {
   String generate() {
     final manager = orchestration!.manager!;
 
-    final buffer = StringBuffer('final class $systemType extends ExecuteSystem {\n');
+    final buffer =
+        StringBuffer('final class $systemType extends ExecuteSystem {\n');
     _writeInteractsWith(buffer, manager);
     _writeGuard(buffer, 'executesIf', executesIf, manager);
     buffer.writeln('  @override');
-    buffer.write('  void execute(Duration elapsed) ${rewriteFunctionBody(execute, manager)}');
+    buffer.write(
+        '  void execute(Duration elapsed) ${rewriteFunctionBody(execute, manager)}');
     _writeHelpers(buffer, manager);
     buffer.write('\n}');
     return buffer.toString();
@@ -161,7 +176,8 @@ final class CleanupSystemModel extends SystemModel {
   String generate() {
     final manager = orchestration!.manager!;
 
-    final buffer = StringBuffer('final class $systemType extends CleanupSystem {\n');
+    final buffer =
+        StringBuffer('final class $systemType extends CleanupSystem {\n');
     _writeInteractsWith(buffer, manager);
     _writeGuard(buffer, 'cleansIf', cleansIf, manager);
     buffer.writeln('  @override');
@@ -195,7 +211,8 @@ final class TeardownSystemModel extends SystemModel {
   String generate() {
     final manager = orchestration!.manager!;
 
-    final buffer = StringBuffer('final class $systemType extends TeardownSystem {\n');
+    final buffer =
+        StringBuffer('final class $systemType extends TeardownSystem {\n');
     _writeInteractsWith(buffer, manager);
     _writeGuard(buffer, 'teardownsIf', teardownsIf, manager);
     buffer.writeln('  @override');
@@ -227,10 +244,12 @@ final class InitializeSystemModel extends SystemModel {
   String generate() {
     final manager = orchestration!.manager!;
 
-    final buffer = StringBuffer('final class $systemType extends InitializeSystem {\n');
+    final buffer =
+        StringBuffer('final class $systemType extends InitializeSystem {\n');
     _writeInteractsWith(buffer, manager);
     buffer.writeln('  @override');
-    buffer.write('  void initialize() ${rewriteFunctionBody(initialize, manager)}');
+    buffer.write(
+        '  void initialize() ${rewriteFunctionBody(initialize, manager)}');
     _writeHelpers(buffer, manager);
     buffer.write('\n}');
     return buffer.toString();

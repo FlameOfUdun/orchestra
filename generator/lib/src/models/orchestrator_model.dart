@@ -21,7 +21,8 @@ final class OrchestratorModel {
 
     for (final entry in orchestrations.entries) {
       final k = entry.key;
-      if (k.name == name && k.firstFragment.libraryFragment?.source.fullName == path) {
+      if (k.name == name &&
+          k.firstFragment.libraryFragment?.source.fullName == path) {
         return entry.value;
       }
     }

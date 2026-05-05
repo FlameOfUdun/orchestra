@@ -15,7 +15,8 @@ final class ComponentDefinition<T> extends ListenableEntityDefinition {
 
   set value(T value) => throw UnimplementedError();
 
-  void update(T value, {bool notify = true, bool force = false}) => throw UnimplementedError();
+  void update(T value, {bool notify = true, bool force = false}) =>
+      throw UnimplementedError();
 }
 
 final class EventDefinition extends ListenableEntityDefinition {

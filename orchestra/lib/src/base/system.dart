@@ -193,7 +193,8 @@ abstract class ReactiveSystem extends System implements EntityListener {
       if (entity is ListenableEntity) {
         entity.addListener(this);
       } else {
-        log('Entity of type $type is not listenable and cannot be reacted to', level: LogLevel.warning);
+        log('Entity of type $type is not listenable and cannot be reacted to',
+            level: LogLevel.warning);
       }
     }
     _isActive = true;
@@ -209,7 +210,8 @@ abstract class ReactiveSystem extends System implements EntityListener {
       if (entity is ListenableEntity) {
         entity.removeListener(this);
       } else {
-        log('Entity of type $type is not listenable and cannot be reacted to', level: LogLevel.warning);
+        log('Entity of type $type is not listenable and cannot be reacted to',
+            level: LogLevel.warning);
       }
     }
     _isActive = false;

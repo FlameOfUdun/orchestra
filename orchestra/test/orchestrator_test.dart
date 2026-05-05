@@ -167,8 +167,8 @@ void main() {
     test('reactive systems only trigger for correct entity types', () {
       final eventReactiveSystem = DummyReactiveSystem();
       final componentReactiveSystem = ComponentReactiveSystem();
-      final orchestration =
-          DummyOrchestration(systems: {eventReactiveSystem, componentReactiveSystem});
+      final orchestration = DummyOrchestration(
+          systems: {eventReactiveSystem, componentReactiveSystem});
       final orchestrator = Orchestrator(orchestrations: {orchestration});
       orchestrator.activate();
 
@@ -184,7 +184,8 @@ void main() {
       expect(componentReactiveSystem.reacted, isTrue);
     });
 
-    test('orchestrator tracks entities from multiple orchestrations correctly', () {
+    test('orchestrator tracks entities from multiple orchestrations correctly',
+        () {
       final orchestrator = Orchestrator(orchestrations: {});
       final orchestration1 = DummyOrchestration();
       final orchestration2 = AnotherDummyOrchestration();
@@ -217,7 +218,8 @@ void main() {
       final orchestration1 = DummyOrchestration(systems: {reactive1});
       final orchestration2 = AnotherDummyOrchestration(systems: {reactive2});
 
-      final orchestrator = Orchestrator(orchestrations: {orchestration1, orchestration2});
+      final orchestrator =
+          Orchestrator(orchestrations: {orchestration1, orchestration2});
       orchestrator.activate();
 
       orchestration1.get<DummyEvent>().trigger();
@@ -239,7 +241,8 @@ void main() {
 
   group('log context', () {
     test('log from system includes orchestrationName and systemName', () {
-      final orchestrator = Orchestrator(orchestrations: {LoggingOrchestration()});
+      final orchestrator =
+          Orchestrator(orchestrations: {LoggingOrchestration()});
       // Orchestrator constructor calls activate() — reactive systems are already registered
       final event = orchestrator.get<DummyEvent>();
       orchestrator.initialize();

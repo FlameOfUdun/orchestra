@@ -111,7 +111,9 @@ final class OrchestraHandle implements EntityListener {
   /// Multiple calls with the same entity type will override the previous listener.
   ///
   /// If called on a disposed context, the operation is silently ignored.
-  void listen<TEntity extends ListenableEntity>(void Function(TEntity entity) listener) {
+  void listen<TEntity extends ListenableEntity>(
+    void Function(TEntity entity) listener,
+  ) {
     if (disposed) {
       return;
     }
@@ -129,10 +131,7 @@ final class OrchestraHandle implements EntityListener {
     if (onEnterListener != null) {
       SchedulerBinding.instance.scheduleFrameCallback((_) {
         if (!disposed) {
-          guard(
-            onEnterListener!,
-            description: 'Orchestra onEnter callback',
-          );
+          guard(onEnterListener!, description: 'Orchestra onEnter callback');
         }
       });
     }
@@ -152,10 +151,7 @@ final class OrchestraHandle implements EntityListener {
     disposed = true;
 
     if (onExitListener != null) {
-      guard(
-        onExitListener!,
-        description: 'Orchestra onExit callback',
-      );
+      guard(onExitListener!, description: 'Orchestra onExit callback');
     }
 
     entities.clear();
@@ -187,10 +183,7 @@ final class OrchestraHandle implements EntityListener {
 
     SchedulerBinding.instance.scheduleFrameCallback((_) {
       if (!disposed) {
-        guard(
-          callback,
-          description: 'Orchestra rebuild callback',
-        );
+        guard(callback, description: 'Orchestra rebuild callback');
       }
       locked = false;
     });
@@ -262,10 +255,7 @@ final class OrchestraHandle implements EntityListener {
         pendingListeners.clear();
 
         for (final callback in callbacks) {
-          guard(
-            callback,
-            description: 'Orchestra listener callback',
-          );
+          guard(callback, description: 'Orchestra listener callback');
         }
       }
       listenerLocked = false;
@@ -274,19 +264,18 @@ final class OrchestraHandle implements EntityListener {
 
   /// Runs a function safely, catching and reporting any errors.
   @visibleForTesting
-  void guard(
-    void Function() function, {
-    required String description,
-  }) {
+  void guard(void Function() function, {required String description}) {
     try {
       function();
     } catch (error, stack) {
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: error,
-        stack: stack,
-        library: 'Orchestra',
-        context: ErrorDescription(description),
-      ));
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'Orchestra',
+          context: ErrorDescription(description),
+        ),
+      );
     }
   }
 }

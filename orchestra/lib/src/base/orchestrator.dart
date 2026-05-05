@@ -39,13 +39,15 @@ final class Orchestrator with Logger {
   bool get isActive => _isActive;
 
   /// Indicates if any orchestration has execute or cleanup systems.
-  bool get hasExecuteOrCleanupSystems => _orchestrations.any((orchestration) => orchestration.hasExecuteOrCleanupSystems);
+  bool get hasExecuteOrCleanupSystems => _orchestrations
+      .any((orchestration) => orchestration.hasExecuteOrCleanupSystems);
 
   /// Unmodifiable set of orchestrations in the orchestrator.
   Set<Orchestration> get orchestrations => Set.unmodifiable(_orchestrations);
 
   /// Unmodifiable set of all entities across all orchestrations.
-  Set<Entity> get entities => Set.unmodifiable(orchestrations.expand((orchestration) => orchestration.entities.values));
+  Set<Entity> get entities => Set.unmodifiable(
+      orchestrations.expand((orchestration) => orchestration.entities.values));
 
   /// Unique identifier for this orchestrator.
   String get identifier => name ?? 'Orchestrator_$index';

@@ -29,12 +29,15 @@ final class ComponentModel extends EntityModel {
     required super.element,
   }) {
     final capitalized = capitalize(name);
-    entityType = capitalized.endsWith("Component") ? capitalized : "${capitalized}Component";
+    entityType = capitalized.endsWith("Component")
+        ? capitalized
+        : "${capitalized}Component";
   }
 
   @override
   String generate() {
-    final buffer = StringBuffer("final class $entityType extends Component<$type> {\n");
+    final buffer =
+        StringBuffer("final class $entityType extends Component<$type> {\n");
     buffer.writeln('  $entityType() : super($value);');
     buffer.write('}');
     return buffer.toString();
@@ -47,7 +50,8 @@ final class EventModel extends EntityModel {
     required super.element,
   }) {
     final capitalized = capitalize(name);
-    entityType = capitalized.endsWith("Event") ? capitalized : "${capitalized}Event";
+    entityType =
+        capitalized.endsWith("Event") ? capitalized : "${capitalized}Event";
   }
 
   @override
@@ -65,7 +69,8 @@ final class DataEventModel extends EntityModel {
     required super.element,
   }) {
     final capitalized = capitalize(name);
-    entityType = capitalized.endsWith("Event") ? capitalized : "${capitalized}Event";
+    entityType =
+        capitalized.endsWith("Event") ? capitalized : "${capitalized}Event";
   }
 
   @override
@@ -85,12 +90,15 @@ final class DependencyModel extends EntityModel {
     required super.element,
   }) {
     final capitalized = capitalize(name);
-    entityType = capitalized.endsWith("Dependency") ? capitalized : "${capitalized}Dependency";
+    entityType = capitalized.endsWith("Dependency")
+        ? capitalized
+        : "${capitalized}Dependency";
   }
 
   @override
   String generate() {
-    final buffer = StringBuffer("final class $entityType extends Dependency<$type> {\n");
+    final buffer =
+        StringBuffer("final class $entityType extends Dependency<$type> {\n");
     buffer.writeln('  $entityType() : super($value);');
     buffer.write('}');
     return buffer.toString();

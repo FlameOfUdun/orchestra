@@ -48,7 +48,8 @@ final class ModifiedEntityCollector extends RecursiveAstVisitor<void> {
     VariableElement? variable;
     if (operand is PropertyAccess && operand.propertyName.name == 'value') {
       variable = extractVariable(operand.target);
-    } else if (operand is PrefixedIdentifier && operand.identifier.name == 'value') {
+    } else if (operand is PrefixedIdentifier &&
+        operand.identifier.name == 'value') {
       variable = resolveToVariable(operand.prefix.element);
     }
     _addIfEntity(variable);

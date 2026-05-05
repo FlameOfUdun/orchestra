@@ -48,11 +48,7 @@ class TestOrchestraWidget extends OrchestraWidget {
   final Function(OrchestraHandle)? onBuild;
   final Widget Function(BuildContext, OrchestraHandle)? customBuilder;
 
-  const TestOrchestraWidget({
-    super.key,
-    this.onBuild,
-    this.customBuilder,
-  });
+  const TestOrchestraWidget({super.key, this.onBuild, this.customBuilder});
 
   @override
   Widget build(BuildContext context, OrchestraHandle handle) {
@@ -99,8 +95,9 @@ void main() {
       expect(capturedOrchestra!.orchestrator, isA<Orchestrator>());
     });
 
-    testWidgets('should rebuild when watched entity changes',
-        (WidgetTester tester) async {
+    testWidgets('should rebuild when watched entity changes', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
 
       await tester.pumpWidget(
@@ -125,8 +122,9 @@ void main() {
       expect(find.text('Counter: 0'), findsNothing);
     });
 
-    testWidgets('should handle onEnter and onExit lifecycle',
-        (WidgetTester tester) async {
+    testWidgets('should handle onEnter and onExit lifecycle', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
       bool onEnterCalled = false;
       bool onExitCalled = false;
@@ -160,9 +158,7 @@ void main() {
 
       // Remove the widget to trigger onExit
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Text('Different Widget'),
-        ),
+        const MaterialApp(home: Text('Different Widget')),
       );
 
       await tester.pump();
@@ -209,8 +205,9 @@ void main() {
       expect(receivedEntity!.value, equals(25));
     });
 
-    testWidgets('should not rebuild after disposal',
-        (WidgetTester tester) async {
+    testWidgets('should not rebuild after disposal', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
 
       await tester.pumpWidget(
@@ -227,9 +224,7 @@ void main() {
 
       // Remove the widget (this should dispose the orchestra binding)
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Text('Different Widget'),
-        ),
+        const MaterialApp(home: Text('Different Widget')),
       );
 
       await tester.pumpAndSettle();
@@ -244,8 +239,9 @@ void main() {
       expect(find.text('Counter: 99'), findsNothing);
     });
 
-    testWidgets('should handle multiple OrchestraWidgets independently',
-        (WidgetTester tester) async {
+    testWidgets('should handle multiple OrchestraWidgets independently', (
+      WidgetTester tester,
+    ) async {
       final orchestration = TestOrchestration();
 
       await tester.pumpWidget(
@@ -254,12 +250,8 @@ void main() {
             orchestrations: {orchestration},
             child: Column(
               children: [
-                TestOrchestraWidget(
-                  key: const Key('widget1'),
-                ),
-                TestOrchestraWidget(
-                  key: const Key('widget2'),
-                ),
+                TestOrchestraWidget(key: const Key('widget1')),
+                TestOrchestraWidget(key: const Key('widget2')),
               ],
             ),
           ),

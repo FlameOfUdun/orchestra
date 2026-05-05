@@ -79,7 +79,8 @@ void _performReload() async {
   try {
     final preferences = await SharedPreferences.getInstance();
     final value = preferences.getString('auth_state');
-    authState.value = value == null ? AuthState.loggedOut : AuthState.values.byName(value);
+    authState.value =
+        value == null ? AuthState.loggedOut : AuthState.values.byName(value);
     reloadProcess.value = const AuthProcess.success(null);
   } catch (e) {
     reloadProcess.value = AuthProcess.failure(e.toString());

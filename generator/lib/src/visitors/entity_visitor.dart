@@ -28,7 +28,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     }
 
     final init = node.initializer;
-    if (init is! MethodInvocation || !_supportedMethods.contains(init.methodName.name)) {
+    if (init is! MethodInvocation ||
+        !_supportedMethods.contains(init.methodName.name)) {
       super.visitVariableDeclaration(node);
       return;
     }
@@ -53,7 +54,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     super.visitVariableDeclaration(node);
   }
 
-  EntityModel? _buildEntity(String name, VariableElement element, MethodInvocation init) {
+  EntityModel? _buildEntity(
+      String name, VariableElement element, MethodInvocation init) {
     return switch (init.methodName.name) {
       'addComponent' => _buildComponent(name, element, init),
       'addEvent' => _buildEvent(name, element),
@@ -67,7 +69,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     return EventModel(name: name, element: element);
   }
 
-  ComponentModel _buildComponent(String name, VariableElement element, MethodInvocation init) {
+  ComponentModel _buildComponent(
+      String name, VariableElement element, MethodInvocation init) {
     final type = _resolveTypeString(name, 'addComponent', element, init);
     final args = init.argumentList.arguments;
     if (args.isEmpty) {
@@ -81,7 +84,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     );
   }
 
-  DataEventModel _buildDataEvent(String name, VariableElement element, MethodInvocation init) {
+  DataEventModel _buildDataEvent(
+      String name, VariableElement element, MethodInvocation init) {
     final type = _resolveTypeString(name, 'addDataEvent', element, init);
     return DataEventModel(
       name: name,
@@ -90,7 +94,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     );
   }
 
-  DependencyModel _buildDependency(String name, VariableElement element, MethodInvocation init) {
+  DependencyModel _buildDependency(
+      String name, VariableElement element, MethodInvocation init) {
     final type = _resolveTypeString(name, 'addDependency', element, init);
     final args = init.argumentList.arguments;
     if (args.isEmpty) {
@@ -104,7 +109,8 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
     );
   }
 
-  String _resolveTypeString(String name, String method, VariableElement element, MethodInvocation init) {
+  String _resolveTypeString(String name, String method, VariableElement element,
+      MethodInvocation init) {
     final explicitArgs = init.typeArguments?.arguments;
     if (explicitArgs != null && explicitArgs.isNotEmpty) {
       final resolved = explicitArgs.first.type?.getDisplayString();
@@ -117,6 +123,7 @@ final class EntityVisitor extends RecursiveAstVisitor<void> {
       return resolved;
     }
 
-    throw StateError('$method("$name"): cannot infer type — supply an explicit type argument.');
+    throw StateError(
+        '$method("$name"): cannot infer type — supply an explicit type argument.');
   }
 }

@@ -87,8 +87,7 @@ final class _OrchestraScopeState extends State<OrchestraScope>
       manager
         ..execute(elapsed)
         ..cleanup();
-    })
-      ..start();
+    })..start();
   }
 
   @override

@@ -25,8 +25,12 @@ final class OrchestrationBuilder implements Builder {
 
     final library = await buildStep.resolver.libraryFor(inputId);
 
-    final fragmentUnit = await buildStep.resolver.astNodeFor(library.firstFragment, resolve: false) as CompilationUnit?;
-    final hasOrchestrationPart = fragmentUnit?.directives.whereType<PartDirective>().any((d) => d.uri.stringValue?.endsWith('.g.dart') ?? false) ?? false;
+    final fragmentUnit = await buildStep.resolver
+        .astNodeFor(library.firstFragment, resolve: false) as CompilationUnit?;
+    final hasOrchestrationPart = fragmentUnit?.directives
+            .whereType<PartDirective>()
+            .any((d) => d.uri.stringValue?.endsWith('.g.dart') ?? false) ??
+        false;
     if (!hasOrchestrationPart) return;
 
     final orchestrator = OrchestratorModel();
@@ -45,11 +49,15 @@ final class OrchestrationBuilder implements Builder {
     unit.accept(EntityVisitor(orchestrator));
     unit.accept(SystemVisitor(orchestrator));
 
-    final localOrchestrations = orchestrator.orchestrations.entries.where((e) => !importedKeys.contains(e.key)).map((e) => e.value).toList();
+    final localOrchestrations = orchestrator.orchestrations.entries
+        .where((e) => !importedKeys.contains(e.key))
+        .map((e) => e.value)
+        .toList();
 
     if (localOrchestrations.isEmpty) return;
     if (localOrchestrations.length > 1) {
-      log.warning('Expected exactly one orchestration per file in ${inputId.path}');
+      log.warning(
+          'Expected exactly one orchestration per file in ${inputId.path}');
       return;
     }
 
@@ -65,12 +73,17 @@ final class OrchestrationBuilder implements Builder {
         ..writeln();
     }
 
-    final formatted = DartFormatter(languageVersion: DartFormatter.latestLanguageVersion, pageWidth: 120).format(buffer.toString());
+    final formatted = DartFormatter(
+            languageVersion: DartFormatter.latestLanguageVersion,
+            pageWidth: 120)
+        .format(buffer.toString());
 
-    await buildStep.writeAsString(inputId.changeExtension('.g.dart'), formatted);
+    await buildStep.writeAsString(
+        inputId.changeExtension('.g.dart'), formatted);
   }
 
-  Future<void> _scanImports(LibraryElement root, OrchestratorModel orchestrator, BuildStep buildStep) async {
+  Future<void> _scanImports(LibraryElement root, OrchestratorModel orchestrator,
+      BuildStep buildStep) async {
     final visited = <LibraryElement>{root};
     final queue = Queue<LibraryElement>();
 

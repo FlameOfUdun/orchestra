@@ -7,7 +7,6 @@ import '../domain/system_firing.dart';
 import '../transport/inspector_message.dart';
 
 InspectorState reduce(InspectorState s, InspectorMessage msg) {
-  print('Applying message: $msg');
   return switch (msg) {
     ConnectionChanged(state: final cs) => s.copyWith(connection: cs),
     Bootstrap(data: final data) => _applyBootstrap(s, data),

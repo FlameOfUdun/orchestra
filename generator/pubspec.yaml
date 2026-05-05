@@ -4,7 +4,7 @@ issue_tracker: https://github.com/FlameOfUdun/orchestra/issues
 repository: https://github.com/FlameOfUdun/orchestra
 homepage: https://github.com/FlameOfUdun/orchestra
 readme: README.md
-version: 1.0.0
+version: 1.0.1
 
 topics:
   - code-generation

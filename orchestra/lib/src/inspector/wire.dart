@@ -84,7 +84,9 @@ sealed class JsonValueDto {
     }
     if (value is List) {
       try {
-        final encoded = value.map((e) => JsonValueDto.encode(e, maxLength: maxLength).toJson()).toList();
+        final encoded = value
+            .map((e) => JsonValueDto.encode(e, maxLength: maxLength).toJson())
+            .toList();
         return DirectValueDto(encoded);
       } catch (_) {
         return _opaqueOf(value, maxLength);
@@ -94,7 +96,8 @@ sealed class JsonValueDto {
       try {
         final encoded = <String, Object?>{};
         for (final entry in value.entries) {
-          encoded[entry.key.toString()] = JsonValueDto.encode(entry.value, maxLength: maxLength).toJson();
+          encoded[entry.key.toString()] =
+              JsonValueDto.encode(entry.value, maxLength: maxLength).toJson();
         }
         return DirectValueDto(encoded);
       } catch (_) {
@@ -181,8 +184,12 @@ final class EntityDto {
         kind: entityKindDtoFromName(json['kind'] as String),
         typeName: json['typeName'] as String,
         orchestrationId: json['orchestrationId'] as String,
-        value: json.containsKey('value') ? JsonValueDto.fromJson(json['value']) : null,
-        previous: json.containsKey('previous') ? JsonValueDto.fromJson(json['previous']) : null,
+        value: json.containsKey('value')
+            ? JsonValueDto.fromJson(json['value'])
+            : null,
+        previous: json.containsKey('previous')
+            ? JsonValueDto.fromJson(json['previous'])
+            : null,
         updatedAtMicros: json['updatedAtMicros'] as int?,
       );
 }
@@ -218,8 +225,11 @@ final class SystemDto {
         name: json['name'] as String,
         kind: systemKindDtoFromName(json['kind'] as String),
         orchestrationId: json['orchestrationId'] as String,
-        reactsToEntityIds: (json['reactsToEntityIds'] as List?)?.cast<String>() ?? const [],
-        interactsWithEntityIds: (json['interactsWithEntityIds'] as List?)?.cast<String>() ?? const [],
+        reactsToEntityIds:
+            (json['reactsToEntityIds'] as List?)?.cast<String>() ?? const [],
+        interactsWithEntityIds:
+            (json['interactsWithEntityIds'] as List?)?.cast<String>() ??
+                const [],
       );
 }
 
@@ -246,7 +256,8 @@ final class OrchestrationDto {
         'systems': systems.map((s) => s.toJson()).toList(),
       };
 
-  factory OrchestrationDto.fromJson(Map<String, Object?> json) => OrchestrationDto(
+  factory OrchestrationDto.fromJson(Map<String, Object?> json) =>
+      OrchestrationDto(
         id: json['id'] as String,
         name: json['name'] as String,
         orchestratorId: json['orchestratorId'] as String,
@@ -279,12 +290,14 @@ final class OrchestratorDto {
         'orchestrations': orchestrations.map((o) => o.toJson()).toList(),
       };
 
-  factory OrchestratorDto.fromJson(Map<String, Object?> json) => OrchestratorDto(
+  factory OrchestratorDto.fromJson(Map<String, Object?> json) =>
+      OrchestratorDto(
         id: json['id'] as String,
         name: json['name'] as String,
         isActive: json['isActive'] as bool? ?? false,
         orchestrations: (json['orchestrations'] as List? ?? const [])
-            .map((o) => OrchestrationDto.fromJson((o as Map).cast<String, Object?>()))
+            .map((o) =>
+                OrchestrationDto.fromJson((o as Map).cast<String, Object?>()))
             .toList(),
       );
 }
@@ -359,13 +372,15 @@ final class SubscribeResponseDto {
         'recentLogs': recentLogs.map((l) => l.toJson()).toList(),
       };
 
-  factory SubscribeResponseDto.fromJson(Map<String, Object?> json) => SubscribeResponseDto(
+  factory SubscribeResponseDto.fromJson(Map<String, Object?> json) =>
+      SubscribeResponseDto(
         protocolVersion: json['protocolVersion'] as int,
         sessionId: json['sessionId'] as String,
         serverStartedAtMicros: json['serverStartedAtMicros'] as int,
         seq: json['seq'] as int,
         orchestrators: (json['orchestrators'] as List? ?? const [])
-            .map((o) => OrchestratorDto.fromJson((o as Map).cast<String, Object?>()))
+            .map((o) =>
+                OrchestratorDto.fromJson((o as Map).cast<String, Object?>()))
             .toList(),
         recentLogs: (json['recentLogs'] as List? ?? const [])
             .map((l) => LogDto.fromJson((l as Map).cast<String, Object?>()))
@@ -403,19 +418,23 @@ sealed class EventDto {
     final ts = json['tsMicros'] as int;
     final sessionId = json['sessionId'] as String;
     return switch (kind) {
-      'heartbeat' => HeartbeatEventDto(seq: seq, tsMicros: ts, sessionId: sessionId),
+      'heartbeat' =>
+        HeartbeatEventDto(seq: seq, tsMicros: ts, sessionId: sessionId),
       'batch' => BatchEventDto(
           seq: seq,
           tsMicros: ts,
           sessionId: sessionId,
           entityUpdates: (json['entityUpdates'] as List? ?? const [])
-              .map((e) => EntityUpdatedEventDto.fromMap((e as Map).cast<String, Object?>()))
+              .map((e) => EntityUpdatedEventDto.fromMap(
+                  (e as Map).cast<String, Object?>()))
               .toList(),
           entityFirings: (json['entityFirings'] as List? ?? const [])
-              .map((e) => EntityFiredEventDto.fromMap((e as Map).cast<String, Object?>()))
+              .map((e) => EntityFiredEventDto.fromMap(
+                  (e as Map).cast<String, Object?>()))
               .toList(),
           systemFirings: (json['systemFirings'] as List? ?? const [])
-              .map((e) => SystemFiredEventDto.fromMap((e as Map).cast<String, Object?>()))
+              .map((e) => SystemFiredEventDto.fromMap(
+                  (e as Map).cast<String, Object?>()))
               .toList(),
           droppedFirings: json['droppedFirings'] as int? ?? 0,
         ),
@@ -425,7 +444,8 @@ sealed class EventDto {
           sessionId: sessionId,
           log: LogDto.fromJson((json['log'] as Map).cast<String, Object?>()),
         ),
-      'topology' => TopologyEventDto.fromJsonInner(json, seq: seq, tsMicros: ts, sessionId: sessionId),
+      'topology' => TopologyEventDto.fromJsonInner(json,
+          seq: seq, tsMicros: ts, sessionId: sessionId),
       _ => throw FormatException('Unknown event kind: $kind'),
     };
   }
@@ -468,10 +488,15 @@ final class EntityUpdatedEventDto {
         'updateCount': updateCount,
       };
 
-  factory EntityUpdatedEventDto.fromMap(Map<String, Object?> json) => EntityUpdatedEventDto(
+  factory EntityUpdatedEventDto.fromMap(Map<String, Object?> json) =>
+      EntityUpdatedEventDto(
         entityId: json['entityId'] as String,
-        value: json.containsKey('value') ? JsonValueDto.fromJson(json['value']) : null,
-        previous: json.containsKey('previous') ? JsonValueDto.fromJson(json['previous']) : null,
+        value: json.containsKey('value')
+            ? JsonValueDto.fromJson(json['value'])
+            : null,
+        previous: json.containsKey('previous')
+            ? JsonValueDto.fromJson(json['previous'])
+            : null,
         updatedAtMicros: json['updatedAtMicros'] as int,
         updateCount: json['updateCount'] as int,
       );
@@ -497,9 +522,12 @@ final class EntityFiredEventDto {
         'fireCount': fireCount,
       };
 
-  factory EntityFiredEventDto.fromMap(Map<String, Object?> json) => EntityFiredEventDto(
+  factory EntityFiredEventDto.fromMap(Map<String, Object?> json) =>
+      EntityFiredEventDto(
         entityId: json['entityId'] as String,
-        payloadValue: json.containsKey('payload') ? JsonValueDto.fromJson(json['payload']) : null,
+        payloadValue: json.containsKey('payload')
+            ? JsonValueDto.fromJson(json['payload'])
+            : null,
         firedAtMicros: json['firedAtMicros'] as int,
         fireCount: json['fireCount'] as int,
       );
@@ -528,7 +556,8 @@ final class SystemFiredEventDto {
         'firedAtMicros': firedAtMicros,
       };
 
-  factory SystemFiredEventDto.fromMap(Map<String, Object?> json) => SystemFiredEventDto(
+  factory SystemFiredEventDto.fromMap(Map<String, Object?> json) =>
+      SystemFiredEventDto(
         systemId: json['systemId'] as String,
         triggerEntityId: json['triggerEntityId'] as String?,
         durationMicros: json['durationMicros'] as int,
@@ -638,13 +667,19 @@ final class TopologyEventDto extends EventDto {
       sessionId: sessionId,
       change: TopologyChangeKind.values.byName(json['change'] as String),
       orchestrator: json['orchestrator'] is Map
-          ? OrchestratorDto.fromJson((json['orchestrator'] as Map).cast<String, Object?>())
+          ? OrchestratorDto.fromJson(
+              (json['orchestrator'] as Map).cast<String, Object?>())
           : null,
       orchestration: json['orchestration'] is Map
-          ? OrchestrationDto.fromJson((json['orchestration'] as Map).cast<String, Object?>())
+          ? OrchestrationDto.fromJson(
+              (json['orchestration'] as Map).cast<String, Object?>())
           : null,
-      entity: json['entity'] is Map ? EntityDto.fromJson((json['entity'] as Map).cast<String, Object?>()) : null,
-      system: json['system'] is Map ? SystemDto.fromJson((json['system'] as Map).cast<String, Object?>()) : null,
+      entity: json['entity'] is Map
+          ? EntityDto.fromJson((json['entity'] as Map).cast<String, Object?>())
+          : null,
+      system: json['system'] is Map
+          ? SystemDto.fromJson((json['system'] as Map).cast<String, Object?>())
+          : null,
       removedId: json['removedId'] as String?,
     );
   }

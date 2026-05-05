@@ -13,7 +13,8 @@ abstract class OrchestraWidget extends StatefulWidget {
   Widget build(BuildContext context, OrchestraHandle handle);
 }
 
-final class _OrchestraWidgetState extends State<OrchestraWidget> with _OrchestraProvider<OrchestraWidget> {
+final class _OrchestraWidgetState extends State<OrchestraWidget>
+    with _OrchestraProvider<OrchestraWidget> {
   @override
   Widget build(BuildContext context) {
     return widget.build(context, orchestra);
@@ -28,17 +29,16 @@ abstract class OrchestraStatefulWidget extends StatefulWidget {
   OrchestraState<OrchestraStatefulWidget> createState();
 }
 
-abstract class OrchestraState<TWidget extends OrchestraStatefulWidget> extends State<TWidget> with _OrchestraProvider {}
+abstract class OrchestraState<TWidget extends OrchestraStatefulWidget>
+    extends State<TWidget>
+    with _OrchestraProvider {}
 
 mixin _OrchestraProvider<T extends StatefulWidget> on State<T> {
   OrchestraHandle? _orchestra;
 
   @protected
   OrchestraHandle get orchestra {
-    return _orchestra ??= OrchestraHandle(
-      OrchestraScope.of(context),
-      _rebuild,
-    );
+    return _orchestra ??= OrchestraHandle(OrchestraScope.of(context), _rebuild);
   }
 
   void _rebuild() {
@@ -66,12 +66,10 @@ mixin _OrchestraProvider<T extends StatefulWidget> on State<T> {
 /// A widget that builds itself based on the orchestra context.
 final class OrchestraBuilder extends OrchestraWidget {
   /// The builder function that creates the widget tree based on the orchestra context.
-  final Widget Function(BuildContext context, OrchestraHandle orchestra) builder;
+  final Widget Function(BuildContext context, OrchestraHandle orchestra)
+  builder;
 
-  const OrchestraBuilder({
-    super.key,
-    required this.builder,
-  });
+  const OrchestraBuilder({super.key, required this.builder});
 
   @override
   Widget build(BuildContext context, OrchestraHandle handle) {

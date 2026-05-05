@@ -52,7 +52,8 @@ final class LoginHandlerReactiveSystem extends ReactiveSystem {
       await preferences.setString('auth_state', AuthState.loggedIn.name);
       await Future.delayed(const Duration(seconds: 2));
       get<AuthStateComponent>().value = AuthState.loggedIn;
-      get<LoginProcessComponent>().value = const AuthProcess.success('mock_token');
+      get<LoginProcessComponent>().value =
+          const AuthProcess.success('mock_token');
     } catch (e) {
       get<LoginProcessComponent>().value = AuthProcess.failure(e.toString());
     }
@@ -120,7 +121,8 @@ final class ReloadHandlerReactiveSystem extends ReactiveSystem {
     try {
       final preferences = await SharedPreferences.getInstance();
       final value = preferences.getString('auth_state');
-      get<AuthStateComponent>().value = value == null ? AuthState.loggedOut : AuthState.values.byName(value);
+      get<AuthStateComponent>().value =
+          value == null ? AuthState.loggedOut : AuthState.values.byName(value);
       get<ReloadProcessComponent>().value = const AuthProcess.success(null);
     } catch (e) {
       get<ReloadProcessComponent>().value = AuthProcess.failure(e.toString());

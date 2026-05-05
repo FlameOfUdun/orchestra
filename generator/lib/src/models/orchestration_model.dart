@@ -19,7 +19,9 @@ final class OrchestrationModel {
     required this.element,
   }) {
     final capitalized = capitalize(name);
-    ecsType = capitalized.endsWith("Orchestration") ? capitalized : "${capitalized}Orchestration";
+    ecsType = capitalized.endsWith("Orchestration")
+        ? capitalized
+        : "${capitalized}Orchestration";
   }
 
   EntityModel? getEntity(VariableElement element) {
@@ -32,7 +34,8 @@ final class OrchestrationModel {
 
     for (final entry in entities.entries) {
       final k = entry.key;
-      if (k.name == name && k.firstFragment.libraryFragment?.source.fullName == path) {
+      if (k.name == name &&
+          k.firstFragment.libraryFragment?.source.fullName == path) {
         return entry.value;
       }
     }
