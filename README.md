@@ -5,6 +5,7 @@ A collection of packages, tools, and examples for the Flutter Orchestra state ma
 ## Projects
 
 - [orchestra](orchestra/README.md): Core library implementing the Event-Component-System patterns for Flutter (components, events, systems, and widget integration).
+- [flutter](flutter/README.md): Flutter widget integration (`orchestra_flutter`) — provides `OrchestraScope`, reactive widgets, and the handle API that connect the Orchestra ECS layer to the Flutter widget tree.
 - [generator](generator/README.md): `build_runner` code generator that converts declarative definitions into concrete classes.
 - [inspector](inspector/README.md): DevTools / inspector tooling for visualizing state and system interactions.
 
