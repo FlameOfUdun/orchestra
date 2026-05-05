@@ -1,0 +1,29 @@
+name: orchestra_flutter
+description: Flutter widget integration for Orchestra — scope, reactive widgets, and context API connecting the Orchestra ECS runtime to the Flutter widget tree.
+version: 1.0.0
+issue_tracker: https://github.com/FlameOfUdun/orchestra/issues
+repository: https://github.com/FlameOfUdun/orchestra
+homepage: https://github.com/FlameOfUdun/orchestra
+readme: README.md
+
+topics:
+  - state-management
+  - architecture
+  - reactive
+  - widgets
+
+environment:
+  sdk: ^3.10.7
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  orchestra:
+    path: ../orchestra
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

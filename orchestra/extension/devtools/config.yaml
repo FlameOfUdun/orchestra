@@ -1,0 +1,5 @@
+name: orchestra_inspector
+version: 1.0.0
+issueTracker: https://github.com/FlameOfUdun/orchestra/issues
+materialIconCodePoint: '0xe0b1'
+requiresConnection: true

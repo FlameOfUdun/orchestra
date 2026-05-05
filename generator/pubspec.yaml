@@ -1,0 +1,26 @@
+name: orchestra_generator
+description: build_runner code generator for Orchestra. Eliminates boilerplate by generating entity and system classes from the Composer declarative DSL.
+issue_tracker: https://github.com/FlameOfUdun/orchestra/issues
+repository: https://github.com/FlameOfUdun/orchestra
+homepage: https://github.com/FlameOfUdun/orchestra
+readme: README.md
+version: 1.0.0
+
+topics:
+  - code-generation
+  - build-runner
+  - state-management
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  analyzer: ^10.0.1
+  build: ^4.0.4
+  source_gen: ^4.2.0
+  dart_style: ^3.0.0
+
+dev_dependencies:
+  build_runner: 2.13.1
+  build_test: ^3.5.7
+  test: ^1.24.0

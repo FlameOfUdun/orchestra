@@ -1,0 +1,7 @@
+builders:
+  orchestration_builder:
+    import: "package:orchestra_generator/orchestra_generator.dart"
+    builder_factories: ["orchestrationBuilder"]
+    build_extensions: {".dart": [".g.dart"]}
+    auto_apply: dependents
+    build_to: source
