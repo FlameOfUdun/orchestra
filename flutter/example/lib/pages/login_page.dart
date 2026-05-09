@@ -19,24 +19,29 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class _LoginButton extends OrchestraWidget {
+class _LoginButton extends StatelessWidget {
   const _LoginButton();
 
   @override
-  Widget build(BuildContext context, OrchestraHandle handle) {
-    final process = handle.watch<LoginProcessComponent>().value;
-    final login = handle.get<LoginEvent>().trigger;
+  Widget build(BuildContext context) {
+    return MultiEntityWatcher(
+      entities: {LoginProcessComponent, LoginEvent},
+      builder: (context, value) {
+        final process = value.get<LoginProcessComponent>().value;
+        final login = value.get<LoginEvent>().trigger;
 
-    return ElevatedButton(
-      onPressed: process.isRunning
-          ? null
-          : () {
-              login(AuthCredentials(
-                username: 'username',
-                password: 'password',
-              ));
-            },
-      child: const Text('Login'),
+        return ElevatedButton(
+          onPressed: process.isRunning
+              ? null
+              : () {
+                  login(AuthCredentials(
+                    username: 'username',
+                    password: 'password',
+                  ));
+                },
+          child: const Text('Login'),
+        );
+      },
     );
   }
 }

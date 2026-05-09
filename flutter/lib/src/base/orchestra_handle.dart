@@ -71,6 +71,21 @@ final class OrchestraHandle implements EntityListener {
     return entity;
   }
 
+  /// Retrieves an entity of type [TEntity].
+  ///
+  /// This function will search the cached entities set first.
+  /// If the entity is not found, it will be fetched from the orchestrator and added
+  /// to the entities set. Otherwise, it will return the existing entity from the set.
+  Entity _fetchType(Type type) {
+    final cached = entities[type];
+    if (cached != null) {
+      return cached;
+    }
+    final entity = orchestrator.getType(type);
+    entities[type] = entity;
+    return entity;
+  }
+
   /// Gets an entity of type [TEntity] from the orchestrator.
   ///
   /// Entities are cached for performance. Subsequent calls for the same type
@@ -84,6 +99,19 @@ final class OrchestraHandle implements EntityListener {
     return _fetch<TEntity>();
   }
 
+  /// Gets an entity of a specific type from the orchestrator.
+  ///
+  /// Entities are cached for performance. Subsequent calls for the same type
+  /// will return the cached instance.
+  ///
+  /// Throws [StateError] if called on a disposed context.
+  Entity getType(Type type) {
+    if (disposed) {
+      throw StateError('Cannot get entity on disposed context');
+    }
+    return _fetchType(type);
+  }
+
   /// Watches an entity of type [TEntity] for changes.
   ///
   /// When the entity changes, the widget will rebuild automatically.
@@ -91,11 +119,35 @@ final class OrchestraHandle implements EntityListener {
   /// Multiple calls with the same entity type will not create duplicate subscriptions.
   ///
   /// Throws [StateError] if called on a disposed context.
-  TEntity watch<TEntity extends ListenableEntity>() {
+  TEntity watch<TEntity extends Entity>() {
     if (disposed) {
       throw StateError('Cannot watch entity on disposed context');
     }
     final entity = _fetch<TEntity>();
+    if (entity is! ListenableEntity) {
+      return entity;
+    }
+    if (watchers.add(entity)) {
+      entity.addListener(this);
+    }
+    return entity;
+  }
+
+  /// Watches an entity of a specific type for changes.
+  ///
+  /// When the entity changes, the widget will rebuild automatically.
+  ///
+  /// Multiple calls with the same entity type will not create duplicate subscriptions.
+  ///
+  /// Throws [StateError] if called on a disposed context.
+  Entity watchType(Type type) {
+    if (disposed) {
+      throw StateError('Cannot watch entity on disposed context');
+    }
+    final entity = _fetchType(type);
+    if (entity is! ListenableEntity) {
+      return entity;
+    }
     if (watchers.add(entity)) {
       entity.addListener(this);
     }
@@ -111,15 +163,81 @@ final class OrchestraHandle implements EntityListener {
   /// Multiple calls with the same entity type will override the previous listener.
   ///
   /// If called on a disposed context, the operation is silently ignored.
-  void listen<TEntity extends ListenableEntity>(
-    void Function(TEntity entity) listener,
-  ) {
+  ///
+  /// Throws [StateError] if called on a disposed context.
+  void listen<TEntity extends Entity>(void Function(TEntity entity) listener) {
     if (disposed) {
-      return;
+      throw StateError('Cannot listen to entity on disposed context');
     }
     final entity = _fetch<TEntity>();
+    if (entity is! ListenableEntity) {
+      return;
+    }
     if (!listeners.containsKey(entity)) entity.addListener(this);
     listeners[entity] = () => listener(entity);
+  }
+
+  /// Listens to changes in an entity of a specific type.
+  ///
+  /// The listener will be called at the next frame boundary when the entity changes.
+  /// Unlike [watch], this does not trigger widget rebuilds.
+  ///
+  /// Callbacks are executed via frame callbacks and are batched together.
+  /// Multiple calls with the same entity type will override the previous listener.
+  ///
+  /// If called on a disposed context, the operation is silently ignored.
+  ///
+  /// Throws [StateError] if called on a disposed context.
+  void listenType(Type type, void Function(ListenableEntity entity) listener) {
+    if (disposed) {
+      throw StateError('Cannot listen to entity on disposed context');
+    }
+    final entity = _fetchType(type);
+    if (entity is! ListenableEntity) {
+      return;
+    }
+    if (!listeners.containsKey(entity)) entity.addListener(this);
+    listeners[entity] = () => listener(entity);
+  }
+
+  /// Unlistens to changes in an entity of type [TEntity].
+  ///
+  /// If the entity is being listened to, the listener will be removed and the entity
+  /// will no longer trigger listener callbacks. This does not affect [watch] subscriptions.
+  /// 
+  /// Throws [StateError] if called on a disposed context.
+  void unlisten<TEntity extends Entity>() {
+    if (disposed) {
+      throw StateError('Cannot unlisten to entity on disposed context');
+    }
+    final entity = _fetch<TEntity>();
+    if (entity is! ListenableEntity) {
+      return;
+    }
+    if (listeners.containsKey(entity)) {
+      entity.removeListener(this);
+      listeners.remove(entity);
+    }
+  }
+
+  /// Unlistens to changes in an entity of a specific type.
+  ///
+  /// If the entity is being listened to, the listener will be removed and the entity
+  /// will no longer trigger listener callbacks. This does not affect [watch] subscriptions.
+  /// 
+  /// Throws [StateError] if called on a disposed context.
+  void unlistenType(Type type) {
+    if (disposed) {
+      throw StateError('Cannot unlisten to entity on disposed context');
+    }
+    final entity = _fetchType(type);
+    if (entity is! ListenableEntity) {
+      return;
+    }
+    if (listeners.containsKey(entity)) {
+      entity.removeListener(this);
+      listeners.remove(entity);
+    }
   }
 
   /// Initializes the Orchestra.
@@ -268,14 +386,7 @@ final class OrchestraHandle implements EntityListener {
     try {
       function();
     } catch (error, stack) {
-      FlutterError.reportError(
-        FlutterErrorDetails(
-          exception: error,
-          stack: stack,
-          library: 'Orchestra',
-          context: ErrorDescription(description),
-        ),
-      );
+      FlutterError.reportError(FlutterErrorDetails(exception: error, stack: stack, library: 'Orchestra', context: ErrorDescription(description)));
     }
   }
 }

@@ -3,7 +3,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:orchestra/orchestra.dart';
 import 'package:orchestra_flutter/orchestra_flutter.dart';
 
+// ---------------------------------------------------------------------------
 // Test entities
+// ---------------------------------------------------------------------------
+
 class TestCounterComponent extends Component<int> {
   TestCounterComponent([super.value = 0]);
 }
@@ -28,6 +31,49 @@ class TestOrchestration extends Orchestration {
     add(TestToggleEvent());
     add(TestIncrementEvent());
     add(TestReactiveSystem());
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helper widgets for OrchestraStatefulWidget tests
+// ---------------------------------------------------------------------------
+
+/// Stateful widget that watches [TestCounterComponent] and increments on tap.
+final class _StatefulCounterWidget extends OrchestraStatefulWidget {
+  _StatefulCounterWidget({super.key});
+
+  @override
+  OrchestraState<_StatefulCounterWidget> createState() => _StatefulCounterWidgetState();
+}
+
+final class _StatefulCounterWidgetState extends OrchestraState<_StatefulCounterWidget> {
+  @override
+  Widget build(BuildContext context) {
+    final counter = handle.watch<TestCounterComponent>();
+    return GestureDetector(
+      onTap: () => setState(() => counter.update(counter.value + 1)),
+      child: Text('state:${counter.value}'),
+    );
+  }
+}
+
+/// Stateful widget that calls onEnter/onExit via the handle lifecycle.
+final class _LifecycleWidget extends OrchestraStatefulWidget {
+  final void Function() onEnter;
+  final void Function() onExit;
+
+  _LifecycleWidget({super.key, required this.onEnter, required this.onExit});
+
+  @override
+  OrchestraState<_LifecycleWidget> createState() => _LifecycleWidgetState();
+}
+
+final class _LifecycleWidgetState extends OrchestraState<_LifecycleWidget> {
+  @override
+  Widget build(BuildContext context) {
+    handle.onEnter(widget.onEnter);
+    handle.onExit(widget.onExit);
+    return const SizedBox();
   }
 }
 
@@ -270,6 +316,231 @@ void main() {
       // Both widgets should update
       expect(find.text('Counter: 15'), findsNWidgets(2));
       expect(find.text('Counter: 0'), findsNothing);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // OrchestraBuilder tests
+  // ---------------------------------------------------------------------------
+
+  group('OrchestraBuilder', () {
+    testWidgets('builds using the provided builder function', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: OrchestraBuilder(
+              builder: (context, handle) {
+                final counter = handle.watch<TestCounterComponent>();
+                return Text('value:${counter.value}');
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('value:0'), findsOneWidget);
+    });
+
+    testWidgets('rebuilds when a watched entity changes', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: OrchestraBuilder(
+              builder: (context, handle) {
+                final counter = handle.watch<TestCounterComponent>();
+                return Text('value:${counter.value}');
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      orchestration.get<TestCounterComponent>().update(7);
+      await tester.pump();
+
+      expect(find.text('value:7'), findsOneWidget);
+      expect(find.text('value:0'), findsNothing);
+    });
+
+    testWidgets('can get entities without watching', (tester) async {
+      final orchestration = TestOrchestration();
+      OrchestraHandle? capturedHandle;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: OrchestraBuilder(
+              builder: (context, handle) {
+                capturedHandle = handle;
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final counter = capturedHandle!.get<TestCounterComponent>();
+      expect(counter, isA<TestCounterComponent>());
+    });
+
+    testWidgets('executes listen callback without causing extra rebuilds', (tester) async {
+      final orchestration = TestOrchestration();
+      int listenerCalls = 0;
+      int buildCalls = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: OrchestraBuilder(
+              builder: (context, handle) {
+                buildCalls++;
+                handle.watch<TestCounterComponent>();
+                handle.listen<TestStringComponent>((entity) {
+                  listenerCalls++;
+                });
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final initialBuilds = buildCalls;
+
+      // Changing the listened (not watched) entity should not rebuild
+      orchestration.get<TestStringComponent>().update('changed');
+      await tester.pump();
+
+      expect(listenerCalls, equals(1));
+      expect(buildCalls, equals(initialBuilds)); // no extra rebuild
+    });
+
+    testWidgets('does not rebuild after scope is removed', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: OrchestraBuilder(
+              builder: (context, handle) {
+                final counter = handle.watch<TestCounterComponent>();
+                return Text('value:${counter.value}');
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(const MaterialApp(home: Text('replaced')));
+      await tester.pumpAndSettle();
+
+      orchestration.get<TestCounterComponent>().update(99);
+      await tester.pump();
+
+      expect(find.text('value:99'), findsNothing);
+      expect(find.text('replaced'), findsOneWidget);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // OrchestraStatefulWidget / OrchestraState tests
+  // ---------------------------------------------------------------------------
+
+  group('OrchestraStatefulWidget', () {
+    testWidgets('builds initial state using orchestra handle', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: _StatefulCounterWidget(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('state:0'), findsOneWidget);
+    });
+
+    testWidgets('rebuilds when watched entity changes', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: _StatefulCounterWidget(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      orchestration.get<TestCounterComponent>().update(21);
+      await tester.pump();
+
+      expect(find.text('state:21'), findsOneWidget);
+      expect(find.text('state:0'), findsNothing);
+    });
+
+    testWidgets('can call setState from OrchestraState', (tester) async {
+      final orchestration = TestOrchestration();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: _StatefulCounterWidget(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Trigger via tap — the widget calls setState internally
+      await tester.tap(find.byType(_StatefulCounterWidget));
+      await tester.pump();
+
+      expect(find.text('state:1'), findsOneWidget);
+    });
+
+    testWidgets('onEnter and onExit are called for OrchestraState', (tester) async {
+      final orchestration = TestOrchestration();
+      bool entered = false;
+      bool exited = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: OrchestraScope(
+            orchestrations: {orchestration},
+            child: _LifecycleWidget(
+              onEnter: () => entered = true,
+              onExit: () => exited = true,
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      expect(entered, isTrue);
+      expect(exited, isFalse);
+
+      await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+      await tester.pump();
+
+      expect(exited, isTrue);
     });
   });
 }

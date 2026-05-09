@@ -9,12 +9,7 @@ class HomePage extends OrchestraWidget {
   @override
   Widget build(BuildContext context, OrchestraHandle handle) {
     handle.onEnter(() {
-      debugPrint('HomePage entered');
       handle.get<ReloadUserEvent>().trigger();
-    });
-
-    handle.onExit(() {
-      debugPrint('HomePage exited');
     });
 
     return Scaffold(
